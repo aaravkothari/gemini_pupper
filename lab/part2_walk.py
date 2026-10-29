@@ -59,8 +59,25 @@ def check_move(vx: float, vy: float, wz_deg: float, duration: float, limits: Mov
     # 3. The duration must be more than 0 and at most limits.duration_max.
     # 4. Too far: speed * duration > limits.distance_max, where speed = (vx**2 + vy**2) ** 0.5.
     # 5. Nothing wrong: return None.
-    return "TODO 2 is not written yet (check_move in lab/part2_walk.py)"
+    # return "TODO 2 is not written yet (check_move in lab/part2_walk.py)"
     # ====================================
+    speed = (vx**2 + vy**2) ** 0.5
+    dist = speed * duration
+    if abs(vx) > limits.vx_max:
+        return f"too fast: |{vx}|<=1.5 m/s"
+    elif abs(vy) > limits.vy_max:
+        return f"too fast: |{vy}|<={limits.vy_max} m/s"
+    elif abs(wz_deg) > limits.wz_max:
+        return f"too fast: |{wz_deg}|<={limits.wz_max} deg/s"
+    elif abs(vx) < MoveLimits.vx_min and abs(vy) < MoveLimits.vy_min and abs(wz_deg) < MoveLimits.wz_min:
+        return "too slow"
+    elif duration <= 0 or duration > limits.duration_max:
+        return f"duration must be more than 0 and at most {limits.duration_max} s"
+    elif dist > limits.distance_max:
+        return f"the distance {dist} can not be executed, goldy can move at most {limits.distance_max} s"
+    return None 
+    
+    
 
 
 async def walk(robot: Robot, vx: float, vy: float, wz_deg: float, duration: float) -> Result:
@@ -141,9 +158,9 @@ async def walk(robot: Robot, vx: float, vy: float, wz_deg: float, duration: floa
 # ========== TODO 3: YOUR CODE HERE ==========
 @tool(
     "turn",
-    "TODO 3: describe the turn tool for Gemini.",
-    direction=Param("string", "TODO 3", enum=["left", "right"]),
-    angle=Param("number", "TODO 3", required=False),
+    "Turns the robot in-place left or right by a certain angle. Use when you need to turn.",
+    direction=Param("string", "set whether you want to turn right or left", enum=["left", "right"]),
+    angle=Param("number", "the angle at which you want to turn from your current position", required=False),
 )
 async def turn_tool(robot: Robot, direction: str, angle: float = 90.0) -> Result:
     # Turn in place: no forward or sideways speed, just a turning speed, for as long
@@ -154,7 +171,13 @@ async def turn_tool(robot: Robot, direction: str, angle: float = 90.0) -> Result
     # 2. How long it takes: seconds = abs(angle) / turn_speed
     #    (90 degrees at 60 deg/s takes 1.5 s)
     # 3. return await walk(robot, 0.0, 0.0, wz_deg, seconds)
-    return not_written("TODO 3", "turn in lab/part2_walk.py")
+    # return not_written("TODO 3", "turn in lab/part2_walk.py")
+    turn_speed = robot.speeds().turn
+    seconds = abs(angle) / turn_speed
+    if direction == "left":
+        return await walk(robot, 0.0, 0.0, turn_speed, seconds)   
+    else:
+        return await walk(robot, 0.0, 0.0, -turn_speed, seconds)   
 
 
 @tool(
@@ -189,7 +212,13 @@ async def move_tool(
     #      return with_note(note, await walk(robot, vx, vy, 0.0, duration))
     # Examples: move("forward") -> vx 0.4 | move("backward", run=True) -> vx -1.2 |
     #   move("forward", run=True, speed=0.6) -> vx 1.0 | move("right", run=True) -> vy -0.4
-    return not_written("TODO 3", "move in lab/part2_walk.py")
+    # return not_written("TODO 3", "move in lab/part2_walk.py")
+    
+    # if run == True and (direction == "forward" or direction == "backward"):
+    #     if speed == None:
+    #         speed = RUN_DEFAULT_SPEED
+    #     speed = max(speed, RUN_MIN_SPEED)
+        
 # ====================================
 
 
