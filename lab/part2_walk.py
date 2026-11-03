@@ -158,7 +158,7 @@ async def walk(robot: Robot, vx: float, vy: float, wz_deg: float, duration: floa
 # ========== TODO 3: YOUR CODE HERE ==========
 @tool(
     "turn",
-    "Turns the robot in-place left or right by a certain angle. Use when you need to turn.",
+    "Turn yourself in-place left or right by a certain angle. Use when you need to turn.",
     direction=Param("string", "set whether you want to turn right or left", enum=["left", "right"]),
     angle=Param("number", "the angle at which you want to turn from your current position", required=False),
 )
@@ -182,11 +182,11 @@ async def turn_tool(robot: Robot, direction: str, angle: float = 90.0) -> Result
 
 @tool(
     "move",
-    "TODO 3: describe the move tool for Gemini.",
-    direction=Param("string", "TODO 3", enum=["forward", "backward", "left", "right"]),
-    run=Param("boolean", "TODO 3", required=False),
-    speed=Param("number", "TODO 3", required=False),
-    duration=Param("number", "TODO 3", required=False),
+    f"Walk OR run yourself in a certain direction, while setting speed and/or durection. Speed up to {LIMITS.vx_max} m/s" + PREPARES_MOVE,
+    direction=Param("string", "Four directions that you can choose to move in", enum=["forward", "backward", "left", "right"]),
+    run=Param("boolean", "True to run, false to walk", required=False),
+    speed=Param("number", "how fast to move in this direction", required=False),
+    duration=Param("number", "how long to move in this direction", required=False),
 )
 async def move_tool(
     robot: Robot,
@@ -212,12 +212,28 @@ async def move_tool(
     #      return with_note(note, await walk(robot, vx, vy, 0.0, duration))
     # Examples: move("forward") -> vx 0.4 | move("backward", run=True) -> vx -1.2 |
     #   move("forward", run=True, speed=0.6) -> vx 1.0 | move("right", run=True) -> vy -0.4
-    # return not_written("TODO 3", "move in lab/part2_walk.py")
-    
-    # if run == True and (direction == "forward" or direction == "backward"):
-    #     if speed == None:
-    #         speed = RUN_DEFAULT_SPEED
-    #     speed = max(speed, RUN_MIN_SPEED)
+    if run and (direction == "forward" or direction == "backward"):
+        speed = max(RUN_MIN_SPEED, speed if speed else RUN_DEFAULT_SPEED)
+    else:
+        speed = speed if speed else robot.speeds().walk
+
+    match direction:
+        case "forward":
+            vx = speed
+            vy = 0
+        case "backward":
+            vx = -speed
+            vy = 0
+        case "left":
+            vx = 0
+            vy = speed
+        case "right":
+            vx = 0
+            vy = -speed
+    note = ""
+    if run and (direction == "left" or direction == "right"):
+        note = "Sideways never runs; walking instead."
+    return with_note(note, await walk(robot, vx, vy, 0.0, duration))
         
 # ====================================
 
