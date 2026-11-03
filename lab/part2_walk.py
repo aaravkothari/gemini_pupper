@@ -197,7 +197,7 @@ async def move_tool(
 ) -> Result:
     # Gemini may leave out run, speed and duration (then they have the defaults above:
     # speed is None when Gemini gave none). Work out ONE speed, then split it into vx and vy.
-    # 1. The speed:
+    # 1. The speed
     #    - running (run is True AND the direction is forward or backward): at least
     #      RUN_MIN_SPEED; if Gemini gave no speed, RUN_DEFAULT_SPEED.
     #      (max(a, b) is the bigger of two numbers: max(0.6, RUN_MIN_SPEED) is 1.0.)
