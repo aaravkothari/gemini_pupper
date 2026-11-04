@@ -283,11 +283,11 @@ async def move_tool(
 # ========== TODO 4: YOUR CODE HERE ==========
 @tool(
     "arc",
-    "TODO 4: describe the arc tool for Gemini.",
-    direction=Param("string", "TODO 4", enum=["left", "right"]),
-    angle=Param("number", "TODO 4"),
-    radius=Param("number", "TODO 4", required=False),
-    speed=Param("number", "TODO 4", required=False),
+    f"use when you want to walk along an arc. One arc goes at most {LIMITS.distance_max} m. Walk forward and turn " + PREPARES_MOVE,
+    direction=Param("string", "direction in which you want to turn in the circle", enum=["left", "right"]),
+    angle=Param("number", "how far along the circle you want to go "),
+    radius=Param("number", "the radius of the circle you are turning around", required=False),
+    speed=Param("number", "how fast you want to turn around the circle", required=False),
 )
 async def arc_tool(
     robot: Robot,
@@ -296,6 +296,27 @@ async def arc_tool(
     radius: float = 0.5,
     speed: float | None = None,
 ) -> Result:
+    speed = speed if speed else robot.speeds().walk
+    if speed <= 0:
+        return Result(False,"speed must be more than 0 m/s")
+
+    if radius < 0:
+        return Result(False,"radius must be 0 m or more")
+
+    wz_max = robot.speeds().limits.wz_max
+    
+    if radius == 0: 
+        return with_note("Radius 0: turned in place (a sharp corner).", await turn_tool(robot, direction, angle))
+    
+    if math.degrees(speed / radius) > wz_max:
+        smallest_rad = speed / math.radians(wz_max)
+        return Result(False,f"too tight: at {speed} m/s the radius must be at least {math.ceil(smallest_rad * 100) / 100} m")
+    
+    wz_deg = math.degrees(speed / radius) if direction == "left" else -math.degrees(speed / radius)
+    seconds = abs(angle) / abs(wz_deg)
+    return await walk(robot, speed, 0.0, wz_deg, seconds)
+        
+    
     # speed is None when Gemini gave none: use robot.speeds().walk (0.4 m/s walking).
     # 1. No circle to follow: if radius < 0 or speed <= 0, return Result(False, ...)
     #    saying which, and what works: "radius must be 0 m or more".
@@ -314,5 +335,5 @@ async def arc_tool(
     # walked a quarter when asked for a circle). The tool registry refuses a call without it.
     # Examples: arc("left", 90) -> vx 0.4, wz +45.8 for 1.96 s |
     #   arc("right", angle=180, radius=1.0, speed=0.6) -> vx 0.6, wz -34.4 for 5.24 s
-    return not_written("TODO 4", "arc in lab/part2_walk.py")
+    # return not_written("TODO 4", "arc in lab/part2_walk.py")
 # ====================================
