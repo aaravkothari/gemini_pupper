@@ -48,11 +48,16 @@ async def prepare_to_move(robot: Robot) -> str:
     Test:                python3 lab/test.py todo5
     """
     # ========== TODO 5: YOUR CODE HERE ==========
+    if robot.following == False:
+        return ""
+    await robot.stop_following()
+    robot.send_speed(0, 0, 0)
+    return "Stopped following the person first."
     # 1. If robot.following is False, there is nothing to do: return "".
     # 2. Turn the person follower off: await robot.stop_following()
     # 3. Stand still (the follower may have been walking): robot.send_speed(0, 0, 0)
     # 4. Return the note Gemini will read, e.g. "Stopped following the person first."
-    return ""  # for now: following never ends
+    # return ""  # for now: following never ends
     # ====================================
 
 
@@ -70,11 +75,12 @@ async def prepare_to_move(robot: Robot) -> str:
 # ========== TODO 6: YOUR CODE HERE ==========
 @tool(
     "follow",
-    "TODO 6: describe the follow tool for Gemini.",
-    enabled=Param("boolean", "TODO 6"),
+    "Follow tool allows the pupper to track the nearest person. Any motion tool (walk, turn, etc) ends it.",
+    enabled=Param("boolean", "Turn on or off following mode"),
 )
 async def follow_tool(robot: Robot, enabled: bool) -> Result:
+    return await robot.set_following(enabled)
     # One line: robot.set_following(enabled) (provided) starts or stops following, and
     # returns the Result Gemini should hear. Await it and return it.
-    return not_written("TODO 6", "follow in lab/part3_follow.py")
+    # return not_written("TODO 6", "follow in lab/part3_follow.py")
 # ====================================

@@ -59,6 +59,12 @@ async def play_trick(robot: Robot, name: str) -> Result:
     instead. Test: python3 lab/test.py optional_jump
     """
     # ========== TODO 7: YOUR CODE HERE ==========
+    trick = robot.tricks.get(name)
+    if trick == None:
+        return Result(False, f"This trick does not exist. Here are the real tricks: {list(robot.tricks)}")
+    note = await prepare_to_move(robot)
+    job = lambda: play_policy_trick(robot, trick)
+    return with_note(note, await robot.queue(f"trick {name}", job, trick.total_time, then=...))
     # NOW:
     # 1. trick = robot.tricks.get(name). If it is None, fail, and list the real names: list(robot.tricks).
     # 2. note = await prepare_to_move(robot)
@@ -68,7 +74,7 @@ async def play_trick(robot: Robot, name: str) -> Result:
     # QUEUE IT:
     # 4. Decide then: which state is Pupper in once the job is done? (Read the card above.)
     # 5. return with_note(note, await robot.queue(f"trick {name}", job, trick.total_time, then=...))
-    return not_written("TODO 7", "play_trick in lab/part4_tricks.py")
+    # return not_written("TODO 7", "play_trick in lab/part4_tricks.py")
     # ====================================
 
 
@@ -148,8 +154,8 @@ async def play_policy_trick(robot: Robot, trick: Trick) -> Result:
 # ========== TODO 8: YOUR CODE HERE ==========
 @tool(
     "play_trick",
-    "TODO 8: describe play_trick for Gemini." + PREPARES_MOVE + "\nTricks:\n{tricks}",
-    name=Param("string", "TODO 8", enum=TRICK_NAMES),
+    "play_trick function allows you to perform any of the prepared tricks " + PREPARES_MOVE + "\nTricks:\n{tricks}",
+    name=Param("string", "prepare trick name", enum=TRICK_NAMES),
 )
 # ====================================
 async def play_trick_tool(robot: Robot, name: str) -> Result:

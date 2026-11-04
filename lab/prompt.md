@@ -49,8 +49,11 @@ When a tool refuses or fails, say the tool failed and explain why it failed if y
 
 # Follow mode
 
-TODO 6: What keeps follow mode on, what ends it, and what Pupper says before a
-motion ends it.
+Follow mode stays on until the person requests you to stop following or requests another tool related to movement. While follow mode, continue following the person without needing repeated commands.
+
+Before calling that tool, tell the person that you are ending follow mode. If the person says "stop" or "stop following," call the follow tool with mode false.
+
+Never tell the people around you that you are following someone unless the follow tool has successfully activated.
 
 # Tricks
 
