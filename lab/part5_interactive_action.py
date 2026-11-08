@@ -73,7 +73,23 @@ async def interactive_action(robot: Robot, action: str) -> Result:
     # QUEUE IT:
     # 5. return await robot.queue(f"{trick.name} {clip}", job, trick.clip_time_estimate(clip),
     #                              then=...)   LOCOMOTION after the exit clip, else trick.
-    return not_written("TODO 9", "interactive_action in lab/part5_interactive_action.py")
+    found = robot.action_ids().get(action)
+    if not found:
+        return Result(False, f"Here are the real actions: {list(robot.action_ids())}")
+    trick, clip = found
+    if robot.state_after_queue is not trick:
+        return Result(False, f"Can't play this action if not currently doing its corresponding trick. Play it first (play_trick {trick.name})")
+    
+    async def job() -> Result:
+      if robot.state_now is not trick:
+         return Result(False, f"Can't play this action if not currently doing its corresponding trick. Play it first (play_trick {trick.name})")
+      if clip == trick.exit_clip:
+         res = await robot.switch_to(LOCOMOTION_CONTROLLER)
+         return Result(res.ok, f"played {clip}; " + ("back in locomotion mode" if res.ok else res.message))
+      else:
+         return await robot.play_clip(trick, clip)
+      
+    return await robot.queue(f"{trick.name} {clip}", job, trick.clip_time_estimate(clip), then=LOCOMOTION if clip is trick.exit_clip else trick)
     # ====================================
 
 
@@ -94,10 +110,10 @@ async def interactive_action(robot: Robot, action: str) -> Result:
 # ========== TODO 10: YOUR CODE HERE ==========
 @tool(
     "interactive_action",
-    "TODO 10: describe interactive_action for Gemini. Actions:\n{actions}",
-    action=Param("string", "TODO 10", enum=ACTION_IDS),
+    "An interactive trick, is a state Pupper stays in while it takes requests: it is made of several short pieces of motion, called clips, and the robot plays them one at a time, on request. Actions:\n{actions}",
+    action=Param("string", "action id for the interactive action to start", enum=ACTION_IDS),
 )
 async def interactive_action_tool(robot: Robot, action: str) -> Result:
     # One line: call interactive_action(robot, action) (your TODO 9), await it, and return it.
-    return not_written("TODO 10", "interactive_action in lab/part5_interactive_action.py")
+   return await interactive_action(robot, action)
 # =====================================

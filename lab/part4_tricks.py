@@ -64,7 +64,7 @@ async def play_trick(robot: Robot, name: str) -> Result:
         return Result(False, f"This trick does not exist. Here are the real tricks: {list(robot.tricks)}")
     note = await prepare_to_move(robot)
     job = lambda: play_policy_trick(robot, trick)
-    return with_note(note, await robot.queue(f"trick {name}", job, trick.total_time, then=...))
+    return with_note(note, await robot.queue(f"trick {name}", job, trick.total_time, then=trick))
     # NOW:
     # 1. trick = robot.tricks.get(name). If it is None, fail, and list the real names: list(robot.tricks).
     # 2. note = await prepare_to_move(robot)
