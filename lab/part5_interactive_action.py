@@ -89,7 +89,7 @@ async def interactive_action(robot: Robot, action: str) -> Result:
       else:
          return await robot.play_clip(trick, clip)
       
-    return await robot.queue(f"{trick.name} {clip}", job, trick.clip_time_estimate(clip), then=LOCOMOTION if clip is trick.exit_clip else trick)
+    return await robot.queue(f"{trick.name} {clip}", job, trick.clip_time_estimate(clip), then=LOCOMOTION if clip == trick.exit_clip else trick)
     # ====================================
 
 

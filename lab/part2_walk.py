@@ -64,17 +64,17 @@ def check_move(vx: float, vy: float, wz_deg: float, duration: float, limits: Mov
     speed = (vx**2 + vy**2) ** 0.5
     dist = speed * duration
     if abs(vx) > limits.vx_max:
-        return f"too fast: |{vx}|<=1.5 m/s"
+        return f"too fast: |vx|<={limits.vx_max} m/s"
     elif abs(vy) > limits.vy_max:
-        return f"too fast: |{vy}|<={limits.vy_max} m/s"
+        return f"too fast: |vy|<={limits.vy_max} m/s"
     elif abs(wz_deg) > limits.wz_max:
-        return f"too fast: |{wz_deg}|<={limits.wz_max} deg/s"
-    elif abs(vx) < MoveLimits.vx_min and abs(vy) < MoveLimits.vy_min and abs(wz_deg) < MoveLimits.wz_min:
-        return "too slow"
+        return f"too fast: |wz|<={limits.wz_max} deg/s"
+    elif abs(vx) < limits.vx_min and abs(vy) < limits.vy_min and abs(wz_deg) < limits.wz_min:
+        return f"too slow to move: need |vx|>={limits.vx_min} m/s, |vy|>={limits.vy_min} m/s or |wz|>={limits.wz_min} deg/s"
     elif duration <= 0 or duration > limits.duration_max:
         return f"duration must be more than 0 and at most {limits.duration_max} s"
     elif dist > limits.distance_max:
-        return f"the distance {dist} can not be executed, goldy can move at most {limits.distance_max} s"
+        return f"the distance {dist} can not be executed, goldy can move at most {limits.distance_max} m"
     return None 
     
     

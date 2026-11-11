@@ -1,18 +1,18 @@
 # sit_stay_shake: fetched with get_trick.py. Edit the description -- it is what Gemini reads
 # when deciding whether to play this trick.
-description: sits down, shaking left or right as instructed and returns back to sitting. Exits trick on stand or a different motion
+description: >-
+  Pupper sits down and stays sitting, ready to shake a paw on request. Afterwards it keeps
+  sitting until asked to stand up or to do another motion (which stands it up first).
+  Use this whenever someone asks Pupper to sit: someone who just says "sit" means sit and stay.
 type: policy
 policy: policy.json
 start_pose: standing
-end_pose: standing
-max_body_angle_deg: 60   # the tilt e-stop while the trick plays
+end_pose: sitting
+max_body_angle_deg: 60   # the tilt e-stop while the trick plays (the sit leans back about 35 degrees)
 # This policy has clips. Name the ones Gemini may ask for while the trick runs,
 # and the clip that returns to standing (played before any other motion):
 actions:
-   sit_down:  Begins the interactive trick and makes the pupper sit down 
-   sit_idle: Pupper remains seated until instructed to shake (returns to sid_idle after) or stand/other motion (exits trick).
-   shake_left: From sit_idle, shakes with pupper's left paw
-   shake_right: From sit_idle, shakes with pupper's right paw
-   stand_up: From sit_idle, exits the trick (to locomotion mode) to standup
+  shake_left: While sitting, Pupper shakes with its left front paw, then keeps sitting.
+  shake_right: While sitting, Pupper shakes with its right front paw, then keeps sitting.
+  stand_up: Pupper stands up from sitting and leaves the trick; afterwards it is standing, in normal walking mode.
 exit_clip: stand_up
-end_pose: sit_idle
